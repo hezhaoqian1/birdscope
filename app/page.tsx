@@ -93,7 +93,7 @@ export default function Home() {
       if (t.predSide === 'YES') pred.yesPrice = target; else pred.noPrice = target;
       next[predIndex] = { type: 'predict', yesPrice: pred.yesPrice, noPrice: pred.noPrice } as any;
     }
-    setMarkets(next);
+    setMarkets([next[0] as DualMarketInput, next[1] as DualMarketInput]);
     if (autoAnalyze) analyze();
   };
 
@@ -112,7 +112,7 @@ export default function Home() {
     if (b.type === 'book') setSide(b, which === 1 ? t.sideA : t.sideB, targetVal);
     next[0] = a.type === 'book' ? { type: 'book', yesOdds: a.yesOdds, noOdds: a.noOdds, oddsFormat: (a.oddsFormat ?? 'decimal') } as any : next[0];
     next[1] = b.type === 'book' ? { type: 'book', yesOdds: b.yesOdds, noOdds: b.noOdds, oddsFormat: (b.oddsFormat ?? 'decimal') } as any : next[1];
-    setMarkets(next);
+    setMarkets([next[0] as DualMarketInput, next[1] as DualMarketInput]);
     if (autoAnalyze) analyze();
   };
 
@@ -281,8 +281,8 @@ export default function Home() {
                   <div className="space-y-3">
                     <div className="segmented">
                       <button className="seg-item" onClick={() => setY(result.y_equal!)}>等利润</button>
-                      <button className="seg-item" onClick={() => setY(Number((result.y_range[0] + (result.y_equal! - result.y_range[0]) * 0.25).toFixed(4)))}>偏向A</button>
-                      <button className="seg-item" onClick={() => setY(Number((result.y_equal! + (result.y_range[1] - result.y_equal!) * 0.25).toFixed(4)))}>偏向B</button>
+                      <button className="seg-item" onClick={() => setY(Number((result.y_range![0] + (result.y_equal! - result.y_range![0]) * 0.25).toFixed(4)))}>偏向A</button>
+                      <button className="seg-item" onClick={() => setY(Number((result.y_equal! + (result.y_range![1] - result.y_equal!) * 0.25).toFixed(4)))}>偏向B</button>
                     </div>
                     <div className="text-xs opacity-70">当前 y={activeY?.toFixed(4)} · Π_A={activePoint?.profitA} · Π_B={activePoint?.profitB}</div>
                   </div>
@@ -377,7 +377,7 @@ export default function Home() {
             <CardContent>
               {result?.graph && result?.y_range ? (
                 <div className="space-y-3">
-                  <div className="h-[280px] w-full">
+                  <div className="h-[220px] md:h-[280px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={result.graph} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                         <defs>
@@ -574,7 +574,19 @@ function MarketCard({ title, market, onChange }: { title: string; market: DualMa
             </div>
             <div className="space-y-2 col-span-2 md:col-span-1">
               <Label>格式</Label>
-              <div className="segmented w-full">
+              {/* Mobile: Select */}
+              <div className="block md:hidden">
+                <Select value={oddsFormat} onValueChange={(v: any) => { setOddsFormat(v); applyBook(oYes, oNo, v); }}>
+                  <SelectTrigger><SelectValue placeholder="格式"/></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="decimal">Decimal</SelectItem>
+                    <SelectItem value="american">American</SelectItem>
+                    <SelectItem value="fractional">Fractional</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Desktop: Segmented */}
+              <div className="segmented w-full hidden md:flex">
                 <button type="button" className={`seg-item ${oddsFormat==='decimal' ? 'active' : ''}`} onClick={() => { setOddsFormat('decimal'); applyBook(oYes, oNo, 'decimal'); }}>Decimal</button>
                 <button type="button" className={`seg-item ${oddsFormat==='american' ? 'active' : ''}`} onClick={() => { setOddsFormat('american'); applyBook(oYes, oNo, 'american'); }}>American</button>
                 <button type="button" className={`seg-item ${oddsFormat==='fractional' ? 'active' : ''}`} onClick={() => { setOddsFormat('fractional'); applyBook(oYes, oNo, 'fractional'); }}>Fractional</button>
