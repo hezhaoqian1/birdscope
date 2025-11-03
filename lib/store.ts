@@ -7,7 +7,7 @@ type State = {
   fees: Fees;
   markets: [DualMarketInput, DualMarketInput];
   result: AnalyzeResult | null;
-  setMarkets: (m: [DualMarketInput, DualMarketInput]) => void;
+  setMarkets: (m: DualMarketInput[] | [DualMarketInput, DualMarketInput]) => void;
   setBudget: (b: number) => void;
   setFees: (f: Fees) => void;
   analyze: () => void;
@@ -21,7 +21,7 @@ export const useArbStore = create<State>((set, get) => ({
     { type: "book", yesOdds: 1.6, noOdds: 2.3, oddsFormat: "decimal" },
   ],
   result: null,
-  setMarkets: (m) => set({ markets: m }),
+  setMarkets: (m) => set({ markets: m.length === 2 ? [m[0], m[1]] : [m[0], m[1]] }),
   setBudget: (b) => set({ budget: b }),
   setFees: (f) => set({ fees: f }),
   analyze: () => {

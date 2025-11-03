@@ -93,7 +93,7 @@ export default function Home() {
       if (t.predSide === 'YES') pred.yesPrice = target; else pred.noPrice = target;
       next[predIndex] = { type: 'predict', yesPrice: pred.yesPrice, noPrice: pred.noPrice } as any;
     }
-    setMarkets([next[0] as DualMarketInput, next[1] as DualMarketInput]);
+    setMarkets(next);
     if (autoAnalyze) analyze();
   };
 
@@ -112,7 +112,7 @@ export default function Home() {
     if (b.type === 'book') setSide(b, which === 1 ? t.sideA : t.sideB, targetVal);
     next[0] = a.type === 'book' ? { type: 'book', yesOdds: a.yesOdds, noOdds: a.noOdds, oddsFormat: (a.oddsFormat ?? 'decimal') } as any : next[0];
     next[1] = b.type === 'book' ? { type: 'book', yesOdds: b.yesOdds, noOdds: b.noOdds, oddsFormat: (b.oddsFormat ?? 'decimal') } as any : next[1];
-    setMarkets([next[0] as DualMarketInput, next[1] as DualMarketInput]);
+    setMarkets(next);
     if (autoAnalyze) analyze();
   };
 
